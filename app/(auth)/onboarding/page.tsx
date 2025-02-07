@@ -1,3 +1,6 @@
+import { Murecho } from "next/font/google";
+import { monitorEventLoopDelay } from "perf_hooks";
+
 async function Page() {
     return (
         <main>
