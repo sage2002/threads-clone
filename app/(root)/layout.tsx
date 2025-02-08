@@ -5,15 +5,15 @@ import { Inter } from "next/font/google";
 
 import Topbar from "@/components/shared/Topbar";
 import LeftSidebar from "@/components/shared/LeftSidebar";
-import RightSidebar from "@/components/shared/Rightsidebar";
+import RightSidebar from "@/components/shared/RightSidebar";
 import Bottombar from "@/components/shared/Bottombar";
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'Threads',
-  description: 'A next.js 13 Metha Threads Application'
-};
+  description: 'A next.js 13 Meta Threads Application'
+}
 
 export default function RootLayout({
   children,
