@@ -16,7 +16,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { UserValidation } from '@/lib/validations/user';
 import { z } from "zod"
 import Image from 'next/image';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
+import { Textarea } from '../ui/textarea';
 
 
 interface Props {
@@ -31,21 +32,41 @@ interface Props {
     btnTitle: string;
 }
 
-const AccountProfile = ({ user, btnTitle }:
-    Props) => {
+const AccountProfile = ({ user, btnTitle }: Props) => {
+    const [files, setfiles] = useState<File[]>([])
 
     const form = useForm({
         resolver: zodResolver(UserValidation),
         defaultValues: {
-            profile_photo: '',
-            username: '',
-            name: '',
-            bio: ''
+            profile_photo: user?.image || "",
+            name: user?.name || "",
+            username: user?.username || "",
+            bio: user?.bio || ""
             }
     })
 
-    const handleImage = (e: ChangeEvent, fieldChange: (value: string) => void) => {
+    const handleImage = (e: ChangeEvent<HTMLInputElement>,
+        fieldChange: (value: string) => void) => {
         e.preventDefault();
+
+
+        const fileReader = new FileReader();
+
+        if(e.target.files && e.target.isDefaultNamespace.length > 0) {
+            const file = e.target.files[0];
+
+            setfiles(Array.from(e.target.files));
+
+            if(!file.type.includes('image')) return;;
+
+            fileReader.onload = async (event) => {
+                const imageDataUrl = event.target?.result?.toString() || '';
+
+                fieldChange(imageDataUrl);
+            }
+
+            fileReader.readAsDataURL(file);
+        }
     }
 
         function onSubmit(values: z.infer<typeof UserValidation>) {
@@ -61,6 +82,7 @@ const AccountProfile = ({ user, btnTitle }:
       <form 
       onSubmit={form.handleSubmit(onSubmit)} 
       className="flex flex-col justify-start gap-10">
+
         <FormField
           control={form.control}
           name="profile_photo"
@@ -96,14 +118,67 @@ const AccountProfile = ({ user, btnTitle }:
                     onChange={(e) => handleImage(e, field.onChange)}
                 />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
-              <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full gap-3">
+              <FormLabel className="text-base-semibold text-light-2">
+                Name
+              </FormLabel>
+              <FormControl>
+                <Input
+                    type="text" 
+                    className="account-form_input no-focus"
+                    {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full gap-3">
+              <FormLabel className="text-base-semibold text-light-2">
+                Username
+              </FormLabel>
+              <FormControl>
+                <Input
+                    type="text" 
+                    className="account-form_input no-focus"
+                    {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="bio"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full gap-3">
+              <FormLabel className="text-base-semibold text-light-2">
+                Bio
+              </FormLabel>
+              <FormControl>
+                
+                <Textarea
+                    rows={10}
+                    className="account-form_input no-focus"
+                    {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="bg-primary-500">Submit</Button>
       </form>
     </Form>
     )
